@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Node.js Interview Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --green: #10b981;
+    --text: #e8e8f0;
+    --muted: #6b7280;
+    --danger: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 8px var(--accent); }
+    50% { box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); }
+  }
+  .header-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    width: 280px;
+    transition: border-color 0.2s;
+  }
+  .header-search:focus-within { border-color: var(--accent); }
+  .header-search input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+  .header-search input::placeholder { color: var(--muted); }
+  .search-icon { color: var(--muted); font-size: 0.85rem; }
+  .header-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .stat-val { color: var(--accent); font-weight: 500; }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    padding: 80px 2rem 60px;
+    text-align: center;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 70%);
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 100px;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 480px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .tag {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tag:hover, .tag.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,255,0.05);
+  }
+
+  /* ─── LAYOUT ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    position: sticky;
+    top: 88px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sidebar-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    padding: 0 12px;
+    margin-bottom: 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .nav-item:hover { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .nav-item.active { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.25); color: var(--accent); }
+  .nav-count {
+    background: var(--surface2);
+    border-radius: 100px;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .nav-item.active .nav-count { background: rgba(0,229,255,0.15); color: var(--accent); }
+  .progress-section {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .progress-title {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .progress-bar-wrap { background: var(--border); border-radius: 100px; height: 6px; margin-bottom: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s ease; }
+  .progress-text { font-size: 0.75rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .progress-text span { color: var(--green); font-weight: 500; }
+
+  /* ─── CONTENT ─── */
+  .content-area {}
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  .section-title { font-size: 1.2rem; font-weight: 700; }
+  .section-sub { font-size: 0.8rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* ─── QUESTION CARD ─── */
+  .questions-grid { display: flex; flex-direction: column; gap: 12px; }
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+    animation: slideIn 0.3s ease both;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q-card:hover { border-color: rgba(0,229,255,0.3); transform: translateY(-1px); }
+  .q-card.solved { border-color: rgba(16,185,129,0.25); }
+  .q-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .q-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 28px;
+  }
+  .q-difficulty {
+    padding: 3px 9px;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .diff-easy { background: rgba(16,185,129,0.15); color: var(--green); }
+  .diff-medium { background: rgba(245,158,11,0.15); color: var(--accent3); }
+  .diff-hard { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .q-title { flex: 1; font-size: 0.95rem; font-weight: 600; line-height: 1.4; }
+  .q-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .q-tag {
+    background: var(--surface2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+  .q-actions { display: flex; align-items: center; gap: 8px; }
+  .solve-btn {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    color: transparent;
+    font-size: 0.7rem;
+  }
+  .solve-btn:hover { border-color: var(--green); color: var(--green); }
+  .solve-btn.done { border-color: var(--green); background: var(--green); color: white; }
+  .chevron {
+    transition: transform 0.25s;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .chevron.open { transform: rotate(180deg); }
+  .q-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .q-body.open { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .answer-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #c4c4d4;
+    padding-top: 16px;
+  }
+  .answer-text strong { color: var(--accent); font-weight: 600; }
+  .code-block {
+    margin: 14px 0;
+    background: #0d0d17;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: #a0aec0;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .kw { color: #7c3aed; }
+  .code-block .fn { color: #00e5ff; }
+  .code-block .str { color: #f59e0b; }
+  .code-block .cmt { color: #4a5568; font-style: italic; }
+  .code-block .num { color: #10b981; }
+  .tip-box {
+    background: rgba(0,229,255,0.05);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: #a0c4cc;
+  }
+  .tip-box strong { color: var(--accent); }
+  .phases-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .phase-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 3px solid var(--accent2);
+    font-size: 0.82rem;
+  }
+  .phase-item b { display: block; color: var(--accent); margin-bottom: 4px; font-size: 0.8rem; }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.82rem;
+  }
+  .compare-table th {
+    background: var(--surface2);
+    padding: 8px 12px;
+    text-align: left;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+    color: #c4c4d4;
+    vertical-align: top;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ─── NO RESULTS ─── */
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .no-results div { font-size: 2.5rem; margin-bottom: 12px; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    position: relative;
+    z-index: 1;
+  }
+  footer span { color: var(--accent); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { position: static; display: flex; flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+    .sidebar-title, .progress-section { display: none; }
+    .nav-item { white-space: nowrap; font-size: 0.8rem; padding: 8px 12px; }
+    .header-stats { display: none; }
+    .header-search { width: 200px; }
+    .phases-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Node.js Prep
+  </div>
+  <div class="header-search">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Search questions...">
+  </div>
+  <div class="header-stats">
+    <div>Questions: <span class="stat-val" id="totalCount">0</span></div>
+    <div>Solved: <span class="stat-val" id="solvedCount">0</span></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">⚡ Interview Ready</div>
+  <h1>Master <span>Node.js</span><br>Interviews</h1>
+  <p>Complete prep guide covering core concepts, performance, security, and system design.</p>
+  <div class="hero-tags" id="heroTags">
+    <span class="tag active" data-filter="all">All Topics</span>
+    <span class="tag" data-filter="core">Core Node.js</span>
+    <span class="tag" data-filter="js">JavaScript</span>
+    <span class="tag" data-filter="express">Express.js</span>
+    <span class="tag" data-filter="security">Security</span>
+    <span class="tag" data-filter="db">Database</span>
+    <span class="tag" data-filter="perf">Performance</span>
+    <span class="tag" data-filter="devops">DevOps</span>
+  </div>
+</div>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="sidebar-title">Categories</div>
+    <a class="nav-item active" data-section="all" href="#">All Questions <span class="nav-count" id="nav-all">0</span></a>
+    <a class="nav-item" data-section="core" href="#">⚙️ Core Node.js <span class="nav-count" id="nav-core">0</span></a>
+    <a class="nav-item" data-section="js" href="#">🟨 JavaScript <span class="nav-count" id="nav-js">0</span></a>
+    <a class="nav-item" data-section="express" href="#">🚂 Express.js <span class="nav-count" id="nav-express">0</span></a>
+    <a class="nav-item" data-section="security" href="#">🔐 Security <span class="nav-count" id="nav-security">0</span></a>
+    <a class="nav-item" data-section="db" href="#">🗄️ Database <span class="nav-count" id="nav-db">0</span></a>
+    <a class="nav-item" data-section="perf" href="#">🚀 Performance <span class="nav-count" id="nav-perf">0</span></a>
+    <a class="nav-item" data-section="devops" href="#">☁️ DevOps <span class="nav-count" id="nav-devops">0</span></a>
+
+    <div class="progress-section">
+      <div class="progress-title">Your Progress</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+      <div class="progress-text"><span id="progressText">0</span> questions solved</div>
+    </div>
+  </aside>
+
+  <main class="content-area">
+    <div class="section-header">
+      <div class="section-icon" id="sectionIcon">📚</div>
+      <div>
+        <div class="section-title" id="sectionTitle">All Questions</div>
+        <div class="section-sub" id="sectionSub">Complete interview preparation guide</div>
+      </div>
+    </div>
+    <div class="questions-grid" id="questionsGrid"></div>
+    <div class="no-results" id="noResults" style="display:none">
+      <div>🔍</div>
+      No questions match your search.
+    </div>
+  </main>
+</div>
+
+<footer>
+  Built for interview prep · <span>Node.js</span> · All rights reserved
+</footer>
+
+<script>
+const questions = [
+  // ─── CORE NODE.JS ───
+  {
+    id: 1, category: 'core', difficulty: 'medium',
+    title: 'What is the Event Loop in Node.js?',
+    tags: ['event-loop', 'async', 'core'],
+    answer: `<strong>Node.js runs on a single thread</strong> but handles thousands of concurrent requests using a non-blocking, event-driven architecture. The <strong>Event Loop</strong> manages async operations by delegating tasks to the system via the <strong>libuv</strong> library. Once complete, callbacks are placed in the queue and executed when the call stack is empty.`,
+    extra: `<div class="phases-grid">
+      <div class="phase-item"><b>1. Timers</b>Executes setTimeout() & setInterval() callbacks</div>
+      <div class="phase-item"><b>2. Pending Callbacks</b>Deferred I/O callbacks (e.g. TCP errors)</div>
+      <div class="phase-item"><b>3. Idle / Prepare</b>Internal Node.js use only</div>
+      <div class="phase-item"><b>4. Poll (Most Important)</b>Handles file, DB, and network I/O</div>
+      <div class="phase-item"><b>5. Check</b>setImmediate() callbacks run here</div>
+      <div class="phase-item"><b>6. Close Callbacks</b>socket.on("close", ...) events</div>
+    </div>
+    <div class="tip-box"><strong>Interview Tip:</strong> Always mention the 6 phases and emphasize the Poll phase as most important for I/O-heavy apps.</div>`
+  },
+  {
+    id: 2, category: 'core', difficulty: 'medium',
+    title: 'What are Microtasks vs Macrotasks?',
+    tags: ['event-loop', 'async', 'promises'],
+    answer: `The event loop processes tasks in order: <strong>synchronous code → microtasks → macrotasks</strong>.`,
+    extra: `<table class="compare-table">
+      <tr><th>Type</th><th>Examples</th><th>Priority</th></tr>
+      <tr><td>Microtasks</td><td>Promise.then(), process.nextTick(), queueMicrotask()</td><td>🔴 Highest</td></tr>
+      <tr><td>Macrotasks</td><td>setTimeout(), setInterval(), setImmediate(), I/O callbacks</td><td>🟡 Lower</td></tr>
+    </table>
+    <div class="tip-box"><strong>Key rule:</strong> process.nextTick() runs before Promise.then() — it's the highest priority of all.</div>`
+  },
+  {
+    id: 3, category: 'core', difficulty: 'easy',
+    title: 'What is libuv and what role does it play?',
+    tags: ['libuv', 'core', 'internals'],
+    answer: `<strong>libuv</strong> is a C library used internally by Node.js. It provides the event loop and handles asynchronous operations including file system I/O, networking, DNS, and <strong>thread pool management</strong>. Without libuv, Node.js wouldn't be able to perform non-blocking I/O on all platforms.`,
+    extra: `<div class="tip-box"><strong>Thread Pool:</strong> libuv maintains a thread pool (default size 4) for operations the OS can't handle asynchronously, like file I/O and DNS lookups. You can increase it via <code>UV_THREADPOOL_SIZE</code>.</div>`
+  },
+  {
+    id: 4, category: 'core', difficulty: 'medium',
+    title: 'What are Streams and why use them?',
+    tags: ['streams', 'buffer', 'performance'],
+    answer: `Streams allow data to be read or written <strong>piece by piece (chunks)</strong> instead of loading everything into memory at once. This makes them ideal for large files, network communication, and real-time data.`,
+    extra: `<table class="compare-table">
+      <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+      <tr><td>Readable</td><td>Read data in chunks</td><td>fs.createReadStream()</td></tr>
+      <tr><td>Writable</td><td>Write data in chunks</td><td>fs.createWriteStream()</td></tr>
+      <tr><td>Duplex</td><td>Both read and write</td><td>TCP socket</td></tr>
+      <tr><td>Transform</td><td>Modify data mid-stream</td><td>zlib compression</td></tr>
+    </table>`
+  },
+  {
+    id: 5, category: 'core', difficulty: 'medium',
+    title: 'What is Backpressure in Node.js streams?',
+    tags: ['streams', 'backpressure', 'performance'],
+    answer: `<strong>Backpressure</strong> occurs when a readable stream produces data faster than a writable stream can handle it. Without control, this causes memory spikes and slow performance.`,
+    extra: `<div class="code-block"><span class="cmt">// pipe() handles backpressure automatically</span>
+<span class="fn">readableStream</span>.<span class="fn">pipe</span>(writableStream);
+
+<span class="cmt">// Manual control</span>
+<span class="kw">const</span> ok = writer.<span class="fn">write</span>(chunk);
+<span class="kw">if</span> (!ok) {
+  reader.<span class="fn">pause</span>(); <span class="cmt">// slow down producer</span>
+  writer.<span class="fn">once</span>(<span class="str">'drain'</span>, () => reader.<span class="fn">resume</span>());
+}</div>`
+  },
+  {
+    id: 6, category: 'core', difficulty: 'easy',
+    title: 'What is process.nextTick() vs setImmediate() vs setTimeout()?',
+    tags: ['event-loop', 'timers', 'async'],
+    answer: `These three behave differently in the event loop:`,
+    extra: `<table class="compare-table">
+      <tr><th>Method</th><th>When it executes</th><th>Priority</th></tr>
+      <tr><td>process.nextTick()</td><td>Before next event loop phase</td><td>🔴 Highest</td></tr>
+      <tr><td>Promise.then()</td><td>Microtask queue (after nextTick)</td><td>🟠 High</td></tr>
+      <tr><td>setImmediate()</td><td>Check phase (after I/O)</td><td>🟡 Medium</td></tr>
+      <tr><td>setTimeout(0)</td><td>Timers phase</td><td>🟢 Lowest</td></tr>
+    </table>
+    <div class="tip-box"><strong>Remember:</strong> nextTick → Promise → setImmediate → setTimeout</div>`
+  },
+  {
+    id: 7, category: 'core', difficulty: 'hard',
+    title: 'What is Worker Threads vs Child Process?',
+    tags: ['worker-threads', 'child-process', 'concurrency'],
+    answer: `Both allow parallel execution, but they differ in how they share resources:`,
+    extra: `<table class="compare-table">
+      <tr><th>Feature</th><th>Worker Thread</th><th>Child Process</th></tr>
+      <tr><td>Execution</td><td>Same process</td><td>Separate process</td></tr>
+      <tr><td>Memory</td><td>Shared (SharedArrayBuffer)</td><td>Separate memory space</td></tr>
+      <tr><td>Use case</td><td>CPU-intensive tasks (image, crypto)</td><td>Running external programs</td></tr>
+      <tr><td>Communication</td><td>Message passing</td><td>IPC channels</td></tr>
+      <tr><td>Overhead</td><td>Low</td><td>High</td></tr>
+    </table>`
+  },
+  {
+    id: 8, category: 'core', difficulty: 'easy',
+    title: 'What is a Buffer in Node.js?',
+    tags: ['buffer', 'binary', 'streams'],
+    answer: `<strong>Buffer</strong> is a built-in Node.js class for handling <strong>raw binary data</strong> directly in memory. It's used when working with file systems, networks, or streams where data comes in chunks rather than complete strings.`,
+    extra: `<div class="code-block"><span class="kw">const</span> buf = Buffer.<span class="fn">from</span>(<span class="str">'Hello World'</span>);
+console.<span class="fn">log</span>(buf);          <span class="cmt">// &lt;Buffer 48 65 6c 6c 6f&gt;</span>
+console.<span class="fn">log</span>(buf.<span class="fn">toString</span>()); <span class="cmt">// Hello World</span></div>`
+  },
+  {
+    id: 9, category: 'core', difficulty: 'medium',
+    title: 'What is the difference between require() and import?',
+    tags: ['modules', 'commonjs', 'esmodules'],
+    answer: `<strong>require()</strong> is CommonJS — synchronous, dynamic, loads at runtime. <strong>import</strong> is ESM — static, tree-shakeable, loads at parse time.`,
+    extra: `<table class="compare-table">
+      <tr><th>Feature</th><th>require()</th><th>import</th></tr>
+      <tr><td>Module System</td><td>CommonJS (CJS)</td><td>ES Modules (ESM)</td></tr>
+      <tr><td>Loading</td><td>Synchronous</td><td>Asynchronous (static)</td></tr>
+      <tr><td>Dynamic</td><td>Yes (conditional require)</td><td>No (top-level only)</td></tr>
+      <tr><td>Tree shaking</td><td>No</td><td>Yes</td></tr>
+      <tr><td>File extension</td><td>.js / .cjs</td><td>.mjs or "type": "module"</td></tr>
+    </table>`
+  },
+  {
+    id: 10, category: 'core', difficulty: 'medium',
+    title: 'What is Event-Driven Architecture vs Event Loop?',
+    tags: ['event-driven', 'event-loop', 'architecture'],
+    answer: `These are related but different concepts often confused in interviews.`,
+    extra: `<table class="compare-table">
+      <tr><th>Concept</th><th>Definition</th><th>Type</th></tr>
+      <tr><td>Event-Driven</td><td>Programming model where code reacts to events (clicks, messages, data)</td><td>Architecture pattern</td></tr>
+      <tr><td>Event Loop</td><td>The mechanism that processes async callbacks from the queue</td><td>Runtime mechanism</td></tr>
+    </table>
+    <div class="tip-box"><strong>Simple rule:</strong> Event-driven = <em>what</em> triggers code. Event loop = <em>how</em> code runs asynchronously.</div>`
+  },
+
+  // ─── JAVASCRIPT CORE ───
+  {
+    id: 11, category: 'js', difficulty: 'medium',
+    title: 'What is a Closure in JavaScript?',
+    tags: ['closure', 'scope', 'functions'],
+    answer: `A <strong>closure</strong> is when an inner function retains access to variables from its outer (lexical) scope even after the outer function has finished executing. This happens because functions remember the environment in which they were created.`,
+    extra: `<div class="code-block"><span class="kw">function</span> <span class="fn">counter</span>() {
+  <span class="kw">let</span> count = <span class="num">0</span>;
+  <span class="kw">return function</span>() {
+    count++;
+    console.<span class="fn">log</span>(count);
+  };
+}
+<span class="kw">const</span> increment = <span class="fn">counter</span>();
+<span class="fn">increment</span>(); <span class="cmt">// 1</span>
+<span class="fn">increment</span>(); <span class="cmt">// 2</span>
+<span class="fn">increment</span>(); <span class="cmt">// 3</span>
+<span class="cmt">// count is "closed over" — persists between calls</span></div>
+<div class="tip-box"><strong>Use cases:</strong> Data encapsulation, private variables, factory functions, memoization, and module patterns.</div>`
+  },
+  {
+    id: 12, category: 'js', difficulty: 'easy',
+    title: 'What is Hoisting in JavaScript?',
+    tags: ['hoisting', 'variables', 'scope'],
+    answer: `<strong>Hoisting</strong> is JavaScript's behavior of moving variable and function <em>declarations</em> to the top of their scope before execution. Only declarations are hoisted — not initializations.`,
+    extra: `<table class="compare-table">
+      <tr><th>Declaration</th><th>Hoisted?</th><th>Initialized to</th></tr>
+      <tr><td>var</td><td>✅ Yes</td><td>undefined</td></tr>
+      <tr><td>let / const</td><td>✅ Yes (but in TDZ)</td><td>❌ Not accessible</td></tr>
+      <tr><td>function declaration</td><td>✅ Fully hoisted</td><td>Function body</td></tr>
+      <tr><td>function expression</td><td>⚠️ Variable only</td><td>undefined</td></tr>
+    </table>`
+  },
+  {
+    id: 13, category: 'js', difficulty: 'easy',
+    title: 'What is IIFE (Immediately Invoked Function Expression)?',
+    tags: ['iife', 'scope', 'patterns'],
+    answer: `An <strong>IIFE</strong> is a function that is defined and immediately called. It creates its own scope, preventing variables from polluting the global namespace.`,
+    extra: `<div class="code-block">(<span class="kw">function</span>() {
+  <span class="kw">const</span> private = <span class="str">"I'm scoped!"</span>;
+  console.<span class="fn">log</span>(private);
+})(); <span class="cmt">// Executes immediately</span>
+
+<span class="cmt">// Arrow function IIFE</span>
+(() => {
+  console.<span class="fn">log</span>(<span class="str">"Modern IIFE"</span>);
+})();</div>`
+  },
+  {
+    id: 14, category: 'js', difficulty: 'medium',
+    title: 'What is the difference between call(), apply(), and bind()?',
+    tags: ['this', 'call', 'apply', 'bind'],
+    answer: `All three allow you to explicitly set the <code>this</code> context of a function, but they differ in execution timing and argument passing.`,
+    extra: `<table class="compare-table">
+      <tr><th>Method</th><th>Executes</th><th>Arguments</th><th>Returns</th></tr>
+      <tr><td>call()</td><td>Immediately</td><td>Comma-separated</td><td>Result</td></tr>
+      <tr><td>apply()</td><td>Immediately</td><td>Array</td><td>Result</td></tr>
+      <tr><td>bind()</td><td>Later (returns fn)</td><td>Comma-separated</td><td>New function</td></tr>
+    </table>
+    <div class="tip-box"><strong>Memory trick:</strong> call = Comma, apply = Array, bind = Both (saves for later)</div>`
+  },
+  {
+    id: 15, category: 'js', difficulty: 'medium',
+    title: 'Shallow Copy vs Deep Copy — what is the difference?',
+    tags: ['copy', 'objects', 'reference'],
+    answer: `<strong>Shallow copy</strong> copies only the top-level properties; nested objects are still referenced. <strong>Deep copy</strong> creates a completely independent clone of all nested levels.`,
+    extra: `<div class="code-block"><span class="cmt">// Shallow copy</span>
+<span class="kw">const</span> shallow = { ...original };
+<span class="cmt">// or Object.assign({}, original)</span>
+
+<span class="cmt">// Deep copy</span>
+<span class="kw">const</span> deep = JSON.<span class="fn">parse</span>(JSON.<span class="fn">stringify</span>(original));
+<span class="cmt">// or structuredClone(original) — modern API</span></div>
+<div class="tip-box"><strong>Caveat:</strong> JSON.parse/stringify loses functions, undefined, and circular refs. Use structuredClone() or lodash.cloneDeep() for production.</div>`
+  },
+  {
+    id: 16, category: 'js', difficulty: 'easy',
+    title: 'What is the difference between forEach() and map()?',
+    tags: ['arrays', 'map', 'foreach'],
+    answer: `Both iterate over arrays, but they serve different purposes.`,
+    extra: `<table class="compare-table">
+      <tr><th>Feature</th><th>forEach()</th><th>map()</th></tr>
+      <tr><td>Returns</td><td>undefined</td><td>New array</td></tr>
+      <tr><td>Use when</td><td>Side effects (log, push)</td><td>Transforming data</td></tr>
+      <tr><td>Chainable</td><td>No</td><td>Yes (.map().filter())</td></tr>
+      <tr><td>Performance</td><td>Slightly faster</td><td>Creates new array</td></tr>
+    </table>`
+  },
+  {
+    id: 17, category: 'js', difficulty: 'medium',
+    title: 'What is a Promise and how does it work?',
+    tags: ['promises', 'async', 'callbacks'],
+    answer: `A <strong>Promise</strong> represents the eventual completion or failure of an async operation. It has three states: <strong>Pending</strong>, <strong>Fulfilled</strong>, and <strong>Rejected</strong>. It solves callback hell by chaining .then() handlers.`,
+    extra: `<div class="code-block"><span class="kw">const</span> fetchData = <span class="kw">new</span> <span class="fn">Promise</span>((resolve, reject) => {
+  setTimeout(() => <span class="fn">resolve</span>(<span class="str">"data"</span>), <span class="num">1000</span>);
+});
+
+fetchData
+  .<span class="fn">then</span>(data => console.<span class="fn">log</span>(data))
+  .<span class="fn">catch</span>(err => console.<span class="fn">log</span>(err));
+
+<span class="cmt">// Promise.all — parallel, fails-fast</span>
+<span class="kw">await</span> Promise.<span class="fn">all</span>([p1, p2, p3]);
+
+<span class="cmt">// Promise.allSettled — waits for all, no fail-fast</span>
+<span class="kw">await</span> Promise.<span class="fn">allSettled</span>([p1, p2, p3]);</div>`
+  },
+  {
+    id: 18, category: 'js', difficulty: 'medium',
+    title: 'What is Callback Hell and how do you solve it?',
+    tags: ['callbacks', 'async', 'promises'],
+    answer: `<strong>Callback Hell</strong> happens when async operations are nested deeply, creating a "pyramid of doom" that is hard to read and maintain.`,
+    extra: `<div class="code-block"><span class="cmt">// ❌ Callback Hell</span>
+<span class="fn">login</span>(user, <span class="kw">function</span>() {
+  <span class="fn">getProfile</span>(<span class="kw">function</span>() {
+    <span class="fn">getPosts</span>(<span class="kw">function</span>() {
+      <span class="fn">getComments</span>(<span class="kw">function</span>() {
+        console.<span class="fn">log</span>(<span class="str">"Done"</span>);
+      });
+    });
+  });
+});
+
+<span class="cmt">// ✅ Async/Await solution</span>
+<span class="kw">async function</span> <span class="fn">main</span>() {
+  <span class="kw">await</span> <span class="fn">login</span>(user);
+  <span class="kw">await</span> <span class="fn">getProfile</span>();
+  <span class="kw">await</span> <span class="fn">getPosts</span>();
+  <span class="kw">await</span> <span class="fn">getComments</span>();
+}</div>`
+  },
+
+  // ─── EXPRESS.JS ───
+  {
+    id: 19, category: 'express', difficulty: 'easy',
+    title: 'What is Middleware in Express.js?',
+    tags: ['middleware', 'express', 'request'],
+    answer: `<strong>Middleware</strong> is a function that runs during the request–response cycle. It has access to <code>req</code>, <code>res</code>, and <code>next</code>. It is used for authentication, logging, validation, and error handling.`,
+    extra: `<div class="code-block"><span class="cmt">// Example middleware</span>
+app.<span class="fn">use</span>((req, res, next) => {
+  console.<span class="fn">log</span>(<span class="str">\`[\${req.method}] \${req.url}\`</span>);
+  <span class="fn">next</span>(); <span class="cmt">// pass to next middleware</span>
+});
+
+<span class="cmt">// Error middleware (4 params)</span>
+app.<span class="fn">use</span>((err, req, res, next) => {
+  res.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ error: err.message });
+});</div>`
+  },
+  {
+    id: 20, category: 'express', difficulty: 'medium',
+    title: 'What is the difference between Middleware and Interceptor?',
+    tags: ['middleware', 'interceptor', 'nestjs'],
+    answer: `Both sit between the client and server logic, but they operate differently.`,
+    extra: `<table class="compare-table">
+      <tr><th>Feature</th><th>Middleware</th><th>Interceptor</th></tr>
+      <tr><td>Common in</td><td>Express.js</td><td>NestJS, Angular</td></tr>
+      <tr><td>Execution</td><td>Before the handler only</td><td>Before AND after handler</td></tr>
+      <tr><td>Control</td><td>Uses next()</td><td>Can transform request/response</td></tr>
+      <tr><td>Access to response</td><td>Limited</td><td>Full (can modify)</td></tr>
+    </table>
+    <div class="tip-box"><strong>One-liner:</strong> Middleware = before handler. Interceptor = wraps the handler.</div>`
+  },
+  {
+    id: 21, category: 'express', difficulty: 'easy',
+    title: 'How do you create a basic Express server with middleware?',
+    tags: ['express', 'server', 'code'],
+    answer: `Here's a production-ready Express server setup with common middleware:`,
+    extra: `<div class="code-block"><span class="kw">const</span> express = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> helmet = <span class="fn">require</span>(<span class="str">'helmet'</span>);
+<span class="kw">const</span> cors = <span class="fn">require</span>(<span class="str">'cors'</span>);
+<span class="kw">const</span> app = <span class="fn">express</span>();
+
+app.<span class="fn">use</span>(<span class="fn">helmet</span>());                    <span class="cmt">// Security headers</span>
+app.<span class="fn">use</span>(<span class="fn">cors</span>());                      <span class="cmt">// CORS policy</span>
+app.<span class="fn">use</span>(express.<span class="fn">json</span>());             <span class="cmt">// Parse JSON body</span>
+
+app.<span class="fn">get</span>(<span class="str">'/'</span>, (req, res) => {
+  res.<span class="fn">json</span>({ message: <span class="str">'Server running!'</span> });
+});
+
+app.<span class="fn">listen</span>(<span class="num">3000</span>, () =>
+  console.<span class="fn">log</span>(<span class="str">'Server on port 3000'</span>)
+);</div>`
+  },
+
+  // ─── SECURITY ───
+  {
+    id: 22, category: 'security', difficulty: 'medium',
+    title: 'What is JWT and how does it work?',
+    tags: ['jwt', 'auth', 'tokens'],
+    answer: `<strong>JWT (JSON Web Token)</strong> is a compact, signed token used for stateless authentication. After login, the server creates a token the client sends in every subsequent request. The server verifies the signature — no session storage needed.`,
+    extra: `<div class="code-block"><span class="cmt">// JWT structure: Header.Payload.Signature</span>
+<span class="kw">const</span> jwt = <span class="fn">require</span>(<span class="str">'jsonwebtoken'</span>);
+
+<span class="cmt">// Create token</span>
+<span class="kw">const</span> token = jwt.<span class="fn">sign</span>(
+  { userId: <span class="num">1</span>, role: <span class="str">'admin'</span> },
+  process.env.JWT_SECRET,
+  { expiresIn: <span class="str">'1h'</span> }
+);
+
+<span class="cmt">// Verify token</span>
+<span class="kw">const</span> decoded = jwt.<span class="fn">verify</span>(token, process.env.JWT_SECRET);</div>
+<div class="tip-box"><strong>Never store JWT in localStorage</strong> — use httpOnly cookies to prevent XSS attacks.</div>`
+  },
+  {
+    id: 23, category: 'security', difficulty: 'easy',
+    title: 'What is CORS and how do you configure it?',
+    tags: ['cors', 'security', 'http'],
+    answer: `<strong>CORS (Cross-Origin Resource Sharing)</strong> is a browser security mechanism that controls how resources are requested from a different domain. By default, browsers block cross-origin requests (Same-Origin Policy).`,
+    extra: `<div class="code-block"><span class="kw">const</span> cors = <span class="fn">require</span>(<span class="str">'cors'</span>);
+
+<span class="cmt">// Allow specific origin</span>
+app.<span class="fn">use</span>(<span class="fn">cors</span>({
+  origin: <span class="str">'https://yourfrontend.com'</span>,
+  methods: [<span class="str">'GET'</span>, <span class="str">'POST'</span>, <span class="str">'PUT'</span>],
+  credentials: <span class="kw">true</span>
+}));</div>`
+  },
+  {
+    id: 24, category: 'security', difficulty: 'medium',
+    title: 'What is Rate Limiting and how do you implement it?',
+    tags: ['rate-limiting', 'security', 'ddos'],
+    answer: `<strong>Rate limiting</strong> controls how many requests a client can make in a time window. It prevents API abuse, DDoS attacks, and brute-force login attempts. Returns <code>HTTP 429</code> when exceeded.`,
+    extra: `<div class="code-block"><span class="kw">const</span> rateLimit = <span class="fn">require</span>(<span class="str">'express-rate-limit'</span>);
+
+<span class="kw">const</span> limiter = <span class="fn">rateLimit</span>({
+  windowMs: <span class="num">15</span> * <span class="num">60</span> * <span class="num">1000</span>, <span class="cmt">// 15 minutes</span>
+  max: <span class="num">100</span>,                  <span class="cmt">// 100 requests/window</span>
+  message: <span class="str">'Too many requests'</span>
+});
+
+app.<span class="fn">use</span>(<span class="str">'/api'</span>, limiter);</div>`
+  },
+  {
+    id: 25, category: 'security', difficulty: 'easy',
+    title: 'What is Helmet.js and what does it protect against?',
+    tags: ['helmet', 'security', 'headers'],
+    answer: `<strong>Helmet</strong> is an Express middleware that sets various HTTP security headers to protect your app from common web vulnerabilities. One line of code adds multiple protections.`,
+    extra: `<table class="compare-table">
+      <tr><th>Header</th><th>Protects Against</th></tr>
+      <tr><td>Content-Security-Policy</td><td>XSS attacks</td></tr>
+      <tr><td>X-Frame-Options</td><td>Clickjacking</td></tr>
+      <tr><td>X-Content-Type-Options</td><td>MIME sniffing</td></tr>
+      <tr><td>Strict-Transport-Security</td><td>Protocol downgrade</td></tr>
+    </table>`
+  },
+  {
+    id: 26, category: 'security', difficulty: 'medium',
+    title: 'What is the difference between Authentication and Authorization?',
+    tags: ['auth', 'security', 'jwt'],
+    answer: `These are often confused but are fundamentally different security concepts.`,
+    extra: `<table class="compare-table">
+      <tr><th>Concept</th><th>Definition</th><th>Question answered</th></tr>
+      <tr><td>Authentication</td><td>Verifying who you are (login)</td><td>"Are you who you say you are?"</td></tr>
+      <tr><td>Authorization</td><td>Determining what you can do (permissions)</td><td>"Are you allowed to do this?"</td></tr>
+    </table>
+    <div class="tip-box"><strong>Example:</strong> Authentication = your ID card. Authorization = which doors your ID opens.</div>`
+  },
+
+  // ─── DATABASE ───
+  {
+    id: 27, category: 'db', difficulty: 'medium',
+    title: 'What are the ACID properties in databases?',
+    tags: ['acid', 'transactions', 'sql'],
+    answer: `<strong>ACID</strong> ensures database transactions are processed reliably, maintaining data integrity even when failures occur.`,
+    extra: `<div class="phases-grid">
+      <div class="phase-item"><b>A — Atomicity</b>All operations complete or none do. Rolled back on failure.</div>
+      <div class="phase-item"><b>C — Consistency</b>DB stays in valid state before & after transaction.</div>
+      <div class="phase-item"><b>I — Isolation</b>Transactions don't interfere with each other.</div>
+      <div class="phase-item"><b>D — Durability</b>Committed data persists even after crashes.</div>
+    </div>`
+  },
+  {
+    id: 28, category: 'db', difficulty: 'easy',
+    title: 'What are SQL JOINs and when to use each type?',
+    tags: ['joins', 'sql', 'mysql'],
+    answer: `JOINs combine rows from multiple tables based on a related column.`,
+    extra: `<table class="compare-table">
+      <tr><th>JOIN Type</th><th>Returns</th></tr>
+      <tr><td>INNER JOIN</td><td>Only rows with matches in BOTH tables</td></tr>
+      <tr><td>LEFT JOIN</td><td>All rows from left + matched rows from right (NULL if no match)</td></tr>
+      <tr><td>RIGHT JOIN</td><td>All rows from right + matched rows from left (NULL if no match)</td></tr>
+      <tr><td>FULL JOIN</td><td>All rows from both tables (NULL where no match)</td></tr>
+    </table>`
+  },
+  {
+    id: 29, category: 'db', difficulty: 'medium',
+    title: 'What is Normalization and its forms (1NF, 2NF, 3NF)?',
+    tags: ['normalization', 'sql', 'design'],
+    answer: `<strong>Normalization</strong> organizes database tables to reduce redundancy and improve data integrity.`,
+    extra: `<div class="phases-grid">
+      <div class="phase-item"><b>1NF</b>Atomic values only. No repeating groups or arrays in a column.</div>
+      <div class="phase-item"><b>2NF</b>Remove partial dependencies. Non-key columns depend on full primary key.</div>
+      <div class="phase-item"><b>3NF (Most Asked)</b>Remove transitive dependencies. Non-key columns don't depend on other non-key columns.</div>
+      <div class="phase-item"><b>BCNF</b>Stricter 3NF. Every determinant is a candidate key.</div>
+    </div>`
+  },
+  {
+    id: 30, category: 'db', difficulty: 'easy',
+    title: 'What is Indexing in MySQL and when should you use it?',
+    tags: ['indexing', 'mysql', 'performance'],
+    answer: `An <strong>Index</strong> is a data structure that speeds up data retrieval. Without an index, MySQL scans every row (full table scan). With an index, it jumps directly to the data.`,
+    extra: `<div class="code-block"><span class="cmt">-- Create an index</span>
+CREATE INDEX idx_email ON users(email);
+
+<span class="cmt">-- Composite index (order matters!)</span>
+CREATE INDEX idx_name_age ON users(last_name, first_name);</div>
+<div class="tip-box"><strong>When NOT to index:</strong> Small tables, columns with high write frequency, or columns with very low cardinality (e.g., boolean).</div>`
+  },
+
+  // ─── PERFORMANCE ───
+  {
+    id: 31, category: 'perf', difficulty: 'hard',
+    title: 'What is the Node.js Cluster module and when should you use it?',
+    tags: ['cluster', 'scaling', 'cpu'],
+    answer: `The <strong>Cluster module</strong> allows a Node.js app to use multiple CPU cores by spawning worker processes. By default, Node.js uses only one core. Cluster forks multiple workers, each running a copy of the app, with a master process distributing incoming connections.`,
+    extra: `<div class="code-block"><span class="kw">const</span> cluster = <span class="fn">require</span>(<span class="str">'cluster'</span>);
+<span class="kw">const</span> os = <span class="fn">require</span>(<span class="str">'os'</span>);
+
+<span class="kw">if</span> (cluster.<span class="fn">isMaster</span>) {
+  <span class="kw">const</span> cpus = os.<span class="fn">cpus</span>().length;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < cpus; i++) {
+    cluster.<span class="fn">fork</span>(); <span class="cmt">// Spawn worker per CPU</span>
+  }
+} <span class="kw">else</span> {
+  app.<span class="fn">listen</span>(<span class="num">3000</span>); <span class="cmt">// Each worker runs server</span>
+}</div>`
+  },
+  {
+    id: 32, category: 'perf', difficulty: 'medium',
+    title: 'What is a Memory Leak and how do you prevent it in Node.js?',
+    tags: ['memory-leak', 'performance', 'debugging'],
+    answer: `A <strong>memory leak</strong> occurs when memory that is no longer needed is not released, causing the app to consume increasingly more RAM over time. The garbage collector cannot remove objects that still have references.`,
+    extra: `<table class="compare-table">
+      <tr><th>Cause</th><th>Fix</th></tr>
+      <tr><td>Global variables</td><td>Use let/const in proper scope</td></tr>
+      <tr><td>Unremoved event listeners</td><td>Use emitter.removeListener() or once()</td></tr>
+      <tr><td>Large closures</td><td>Nullify unneeded references</td></tr>
+      <tr><td>Unbounded caches</td><td>Use LRU cache with size limits</td></tr>
+    </table>`
+  },
+  {
+    id: 33, category: 'perf', difficulty: 'medium',
+    title: 'What happens if the Event Loop is blocked?',
+    tags: ['event-loop', 'performance', 'blocking'],
+    answer: `If the event loop is blocked by <strong>heavy synchronous code</strong> (e.g., a large for-loop, synchronous file read), Node.js cannot process any other requests.`,
+    extra: `<div class="phases-grid">
+      <div class="phase-item"><b>Symptoms</b>High response times, timeouts, unresponsive app, poor scalability</div>
+      <div class="phase-item"><b>Causes</b>Synchronous I/O, heavy CPU computation, large JSON parsing</div>
+      <div class="phase-item"><b>Solutions</b>Use async/await, Worker Threads for CPU tasks, stream for large data</div>
+      <div class="phase-item"><b>Detection</b>Use clinic.js or --prof flag to profile event loop lag</div>
+    </div>`
+  },
+
+  // ─── DEVOPS ───
+  {
+    id: 34, category: 'devops', difficulty: 'easy',
+    title: 'What is caching and how does Redis help?',
+    tags: ['caching', 'redis', 'performance'],
+    answer: `<strong>Caching</strong> stores frequently accessed data in fast memory (like Redis) to avoid repeated expensive database queries. Redis is an in-memory data store that can serve data in microseconds.`,
+    extra: `<div class="code-block"><span class="kw">const</span> redis = <span class="fn">require</span>(<span class="str">'ioredis'</span>);
+<span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">Redis</span>();
+
+<span class="cmt">// Cache with TTL</span>
+<span class="kw">await</span> client.<span class="fn">set</span>(<span class="str">'user:1'</span>, JSON.<span class="fn">stringify</span>(user), <span class="str">'EX'</span>, <span class="num">3600</span>);
+<span class="kw">const</span> cached = <span class="kw">await</span> client.<span class="fn">get</span>(<span class="str">'user:1'</span>);</div>`
+  },
+  {
+    id: 35, category: 'devops', difficulty: 'medium',
+    title: 'What is Load Balancing and how does it work?',
+    tags: ['load-balancing', 'scaling', 'devops'],
+    answer: `A <strong>load balancer</strong> distributes incoming traffic across multiple server instances, preventing any single server from being overwhelmed. It improves availability and scalability.`,
+    extra: `<table class="compare-table">
+      <tr><th>Algorithm</th><th>How it works</th></tr>
+      <tr><td>Round Robin</td><td>Each request goes to next server in rotation</td></tr>
+      <tr><td>Least Connections</td><td>Route to server with fewest active connections</td></tr>
+      <tr><td>IP Hash</td><td>Same client always hits same server (sticky sessions)</td></tr>
+      <tr><td>Weighted</td><td>More powerful servers get more traffic</td></tr>
+    </table>`
+  },
+  {
+    id: 36, category: 'devops', difficulty: 'easy',
+    title: 'What is CI/CD and how does it benefit Node.js projects?',
+    tags: ['cicd', 'deployment', 'devops'],
+    answer: `<strong>CI/CD</strong> (Continuous Integration/Continuous Deployment) automates the build, test, and deployment pipeline. Every code push triggers automated tests, and if they pass, code is deployed automatically.`,
+    extra: `<div class="phases-grid">
+      <div class="phase-item"><b>CI (Integration)</b>Auto-run tests on every commit. Catch bugs early.</div>
+      <div class="phase-item"><b>CD (Delivery)</b>Auto-deploy to staging after CI passes.</div>
+      <div class="phase-item"><b>Tools</b>GitHub Actions, Jenkins, CircleCI, GitLab CI</div>
+      <div class="phase-item"><b>Benefits</b>Faster releases, fewer bugs, consistent deployments</div>
+    </div>`
+  },
+  {
+    id: 37, category: 'devops', difficulty: 'medium',
+    title: 'How do you design a production-ready payment system?',
+    tags: ['system-design', 'stripe', 'webhooks'],
+    answer: `A robust payment system requires multiple layers: API, gateway, confirmation, and idempotency to handle failures gracefully.`,
+    extra: `<div class="phases-grid">
+      <div class="phase-item"><b>1. API Layer</b>Validate request, create payment intent on backend</div>
+      <div class="phase-item"><b>2. Payment Gateway</b>Use Stripe/Razorpay SDK, send client_secret to frontend</div>
+      <div class="phase-item"><b>3. Webhooks</b>Handle payment.success / payment.failed events asynchronously</div>
+      <div class="phase-item"><b>4. Idempotency</b>Use idempotency keys to prevent duplicate charges on retry</div>
+    </div>`
+  }
+];
+
+// ─── STATE ───
+let activeCategory = 'all';
+let solvedSet = new Set(JSON.parse(localStorage.getItem('solved') || '[]'));
+
+function saveSolved() {
+  localStorage.setItem('solved', JSON.stringify([...solvedSet]));
+}
+
+function updateProgress() {
+  const total = questions.length;
+  const solved = solvedSet.size;
+  const pct = total > 0 ? Math.round((solved / total) * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = solved + '/' + total;
+  document.getElementById('solvedCount').textContent = solved;
+  document.getElementById('totalCount').textContent = total;
+}
+
+function getCategoryMeta(cat) {
+  const map = {
+    all: { icon: '📚', title: 'All Questions', sub: 'Complete interview preparation guide' },
+    core: { icon: '⚙️', title: 'Core Node.js', sub: 'Event loop, streams, libuv, worker threads' },
+    js: { icon: '🟨', title: 'JavaScript Core', sub: 'Closures, hoisting, promises, ES6' },
+    express: { icon: '🚂', title: 'Express.js', sub: 'Middleware, routing, interceptors' },
+    security: { icon: '🔐', title: 'Security', sub: 'JWT, CORS, rate limiting, helmet' },
+    db: { icon: '🗄️', title: 'Database', sub: 'SQL, ACID, normalization, indexing' },
+    perf: { icon: '🚀', title: 'Performance', sub: 'Cluster, memory leaks, optimization' },
+    devops: { icon: '☁️', title: 'DevOps & System Design', sub: 'CI/CD, caching, load balancing' }
+  };
+  return map[cat] || map.all;
+}
+
+function renderQuestions(filtered) {
+  const grid = document.getElementById('questionsGrid');
+  const noRes = document.getElementById('noResults');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    noRes.style.display = 'block';
+    return;
+  }
+  noRes.style.display = 'none';
+
+  grid.innerHTML = filtered.map((q, i) => `
+    <div class="q-card ${solvedSet.has(q.id) ? 'solved' : ''}" id="card-${q.id}" style="animation-delay:${i * 0.04}s">
+      <div class="q-header" onclick="toggleCard(${q.id})">
+        <span class="q-num">#${q.id}</span>
+        <span class="q-difficulty diff-${q.difficulty}">${q.difficulty}</span>
+        <span class="q-title">${q.title}</span>
+        <div class="q-tags">${q.tags.slice(0,2).map(t => `<span class="q-tag">${t}</span>`).join('')}</div>
+        <div class="q-actions">
+          <button class="solve-btn ${solvedSet.has(q.id) ? 'done' : ''}"
+            onclick="toggleSolved(event, ${q.id})" title="Mark as solved">✓</button>
+          <span class="chevron" id="chevron-${q.id}">▾</span>
+        </div>
+      </div>
+      <div class="q-body" id="body-${q.id}">
+        <div class="answer-text">${q.answer}${q.extra || ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCard(id) {
+  const body = document.getElementById('body-' + id);
+  const chevron = document.getElementById('chevron-' + id);
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+function toggleSolved(e, id) {
+  e.stopPropagation();
+  if (solvedSet.has(id)) {
+    solvedSet.delete(id);
+  } else {
+    solvedSet.add(id);
+  }
+  saveSolved();
+  updateProgress();
+  const card = document.getElementById('card-' + id);
+  const btn = card.querySelector('.solve-btn');
+  card.classList.toggle('solved', solvedSet.has(id));
+  btn.classList.toggle('done', solvedSet.has(id));
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  const meta = getCategoryMeta(cat);
+  document.getElementById('sectionIcon').textContent = meta.icon;
+  document.getElementById('sectionTitle').textContent = meta.title;
+  document.getElementById('sectionSub').textContent = meta.sub;
+
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.section === cat);
+  });
+  document.querySelectorAll('.tag').forEach(t => {
+    t.classList.toggle('active', t.dataset.filter === cat);
+  });
+
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = questions;
+  if (activeCategory !== 'all') {
+    filtered = filtered.filter(x => x.category === activeCategory);
+  }
+  if (q) {
+    filtered = filtered.filter(x =>
+      x.title.toLowerCase().includes(q) ||
+      x.tags.some(t => t.includes(q)) ||
+      x.difficulty.includes(q)
+    );
+  }
+  renderQuestions(filtered);
+}
+
+// Update nav counts
+function updateCounts() {
+  const cats = ['all','core','js','express','security','db','perf','devops'];
+  cats.forEach(cat => {
+    const count = cat === 'all' ? questions.length : questions.filter(q => q.category === cat).length;
+    const el = document.getElementById('nav-' + cat);
+    if (el) el.textContent = count;
+  });
+}
+
+// ─── INIT ───
+document.querySelectorAll('.nav-item').forEach(n => {
+  n.addEventListener('click', e => { e.preventDefault(); setCategory(n.dataset.section); });
+});
+document.querySelectorAll('.tag').forEach(t => {
+  t.addEventListener('click', () => setCategory(t.dataset.filter));
+});
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+updateCounts();
+setCategory('all');
+updateProgress();
+</script>
+</body>
+</html>
